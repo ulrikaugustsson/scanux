@@ -1,38 +1,41 @@
-import {Observable, BehaviorSubject, Subject} from 'rx';
+import Rx from 'rx';
 
-const redix = () => {
-	const dispatcher = new BehaviorSubject();
+export default function (initalState = {}) {
+	const masterStore = new Rx.BehaviorSubject(initalState);
+	const dispatcher = new Rx.Subject();
 	const actions = {};
-	const store = new Subject();
 
 	return {
-		registerReducer: (action, reducer) => {
+		registerReducer: (actionName, reducer, initalState = {}) => {
 			dispatcher
 				.filter(obj => {
-					return obj && obj.action === action
+					return obj && obj.actionName === actionName
 				})
 				.map(obj => obj.observable)
-				.flatMap(obs => {
-					return obs;
-				})
-				.scan(reducer)
-				.subscribe(data => {
-					store.onNext({action, data});
+				.flatMap(observable => observable)
+				.scan(reducer, initalState)
+				.subscribe(newState => {
+					masterStore
+						.onNext(newState);
 				});
 		},
-		registerAction: (action, actionHandler) => {
-			actions[action] = actionHandler;
+
+		listen: (callback, errorHandler, onComplete) => {
+			return masterStore
+				.scan((prev, next) => {
+					return {...prev, ...next};
+				}, {})
+				.subscribe(callback, errorHandler, onComplete);
 		},
-		triggerAction: (action, data) => {
-			dispatcher.onNext(
-				{action, observable: Observable.fromPromise(actions[action](data))}
-			);
+
+		addAction: (actionName, action) => {
+			actions[actionName] = action;
 		},
-		subscribe: (successCb, errorCb, completeCb) => {
-			return store
-				.subscribe(successCb, errorCb, completeCb);
+
+		triggerAction: (actionName, data) => {
+			dispatcher.onNext({
+				actionName, observable: actions[actionName](data)
+			});
 		}
 	}
 }
-
-export default redix;
