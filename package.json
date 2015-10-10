@@ -1,14 +1,17 @@
 {
   "name": "scanux",
-  "version": "0.0.1",
+  "version": "0.3.1",
   "description": "Flux implementation with rxjs",
-  "main": "index.js",
+  "main": "src/index.js",
   "dependencies": {
     "rx": "^3.1.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "babel": "^5.8.23"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "babel index.js --out-file ./src/index.js"
   },
   "repository": {
     "type": "git",
