@@ -1,10 +1,10 @@
 {
   "name": "scanux",
-  "version": "0.3.1",
+  "version": "0.4.1",
   "description": "Flux implementation with rxjs",
   "main": "src/index.js",
   "dependencies": {
-    "rx": "^3.1.2"
+    "rx": "^4.0.6"
   },
   "devDependencies": {
     "babel": "^5.8.23"
